@@ -13,7 +13,7 @@ BEGIN {
   $VERSION = sprintf "%d.%03d", q$Revision:  1.1 $ =~ /(\d+)/g;
 
   @ISA    = qw(Exporter);
-  @EXPORT = qw(&dist &target_azel_at_lst &airmass_at_el);
+  @EXPORT = qw(&dist &target_azel_at_lst &airmass_at_el &center_ra_dec );
 }
 
 =head1 SYNOPSIS
@@ -54,4 +54,23 @@ sub airmass_at_el {
   return 1.0/sin(d2r($arg));
 }
 
+# argument is an array of ($ra,$dec), both in degs
+
+sub center_ra_dec {
+  my ($x,$y,$z)=(0.0,0.0,0.0);
+  my $n=scalar(@_);
+  for (my $i=0; $i<$n; $i+=2) {
+    my $ra=$_[$i];
+    my $dec=$_[$i+1];
+    my ($xi,$yi,$zi)=pol2r(deg2turn($ra),deg2turn($dec));
+    $x+=$xi;  $y+=$yi; $z+=$zi;
+  }
+  $x/=$n;
+  $y/=$n;
+  $z/=$n;
+  my ($r,$d)=r2pol($x,$y,$z);
+  return (turn2deg($r),turn2deg($d));
+}
+    
+  
 1;
